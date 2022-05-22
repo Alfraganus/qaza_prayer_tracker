@@ -107,6 +107,7 @@ class _getPrayerState extends State<getPrayer> {
             onPressed: () { },
             child: Text('+'),
           )
+
         ],
       ),
     );
