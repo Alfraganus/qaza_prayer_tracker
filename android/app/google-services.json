@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "24199581709",
+    "project_id": "qaza-prayers-tracker",
+    "storage_bucket": "qaza-prayers-tracker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:24199581709:android:5f229a990eb571ae884544",
+        "android_client_info": {
+          "package_name": "com.example.qaza_prayer_tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "24199581709-rt6h737ld3pu4hd0kf197g4bc0p5bhe4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxKKYaaaQunICA_pZg_Ew_XfTOsQW1jrU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "24199581709-rt6h737ld3pu4hd0kf197g4bc0p5bhe4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
