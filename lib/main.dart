@@ -1,10 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qaza_prayer_tracker/provider/counter_provider.dart';
+import 'firebase/functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 Future<void> test()
 async {
   await Firebase.initializeApp(
@@ -77,7 +78,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed:() {
+           /*baza jonatish hsu yerdan boladi*/
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
