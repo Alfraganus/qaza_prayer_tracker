@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import 'package:qaza_prayer_tracker/provider/counter_provider.dart';
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) =>Counter(250))
+    ],child: MyApp(),),
+  );
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -13,15 +17,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -49,34 +44,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-         /*w*/
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-            getPrayer()
-          ],
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 30),
+          child: Wrap(
+            spacing: 20, // to apply margin in the main axis of the wrap
+            runSpacing: 20,
+            children: <Widget>[
+              getPrayer(PrayerName: 'Bondot ${context.watch<Counter>().count}',),
+              getPrayer(PrayerName: 'Peshin',),
+              getPrayer(PrayerName: 'Asr',),
+              getPrayer(PrayerName: 'Shom',),
+              getPrayer(PrayerName: 'Xufton',),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -88,14 +74,19 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class getPrayer extends StatefulWidget {
-  const getPrayer({Key? key}) : super(key: key);
 
+
+
+class getPrayer extends StatefulWidget {
+  const getPrayer({Key? key, required this.PrayerName, this.PrayerId}) : super(key: key);
   @override
+  final String PrayerName;
+  final int? PrayerId;
   State<getPrayer> createState() => _getPrayerState();
 }
 
 class _getPrayerState extends State<getPrayer> {
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -104,13 +95,28 @@ class _getPrayerState extends State<getPrayer> {
           RaisedButton(
             color: Colors.red, // background
             textColor: Colors.white, // foreground
-            onPressed: () { },
+            onPressed: () {
+              context.read<Counter>().decrement();
+            },
+            child: Text('-'),
+          ),
+          SizedBox(width: 20,),
+          Text(widget.PrayerName),
+          SizedBox(width: 20,),
+          RaisedButton(
+            color: Colors.red, // background
+            textColor: Colors.white, // foreground
+            onPressed: () {
+              context.read<Counter>().increment();
+            },
             child: Text('+'),
           )
-
         ],
       ),
     );
   }
 }
+
+
+
 
