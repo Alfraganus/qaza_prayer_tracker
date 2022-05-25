@@ -1,13 +1,18 @@
 class UserData {
   final String prayer_type;
-  final String count;
-  UserData(this.prayer_type, this.count);
+  final String times;
+  UserData(this.prayer_type, this.times);
 
-  Map<String, dynamic> getDataMap() {
+
+  Map<String,dynamic> createMap(){
     return {
-      "prayer_type": 'Peshin',
-      "count": '3',
-
+      'prayer_type': prayer_type,
+      'times': times,
     };
   }
+
+  UserData.fromFirestore(Map<String,dynamic> firestoreMap):
+        prayer_type = firestoreMap['prayer_type'],
+        times = firestoreMap['times'];
+
 }
