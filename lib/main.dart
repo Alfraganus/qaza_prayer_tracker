@@ -146,7 +146,7 @@ class _getPrayerState extends State<getPrayer> {
 
 class Data extends StatelessWidget {
    Data({Key? key}) : super(key: key);
-  final Stream<QuerySnapshot>prayers = FirebaseFirestore.instance.collection('PrayerCounts').snapshots();
+  final Stream<QuerySnapshot>prayers = FirebaseFirestore.instance.collection('PrayerCounts').where('prayerType',isEqualTo: 'Bondot').snapshots();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -160,14 +160,16 @@ class Data extends StatelessWidget {
         if(snapshot.connectionState == ConnectionState.waiting) {
           return Text('Loading');
         }
-        final data = snapshot.requireData;
-        return data.docs.asMap().isNotEmpty? ListView.builder(
-          itemCount: data.size,
+        return snapshot.hasData  ? ListView.builder(
+
+          itemCount: snapshot.requireData.size,
           itemBuilder: (context, index) {
-           return Text('the prayer name is ${data.docs[index]['prayerType']}');
+            var data = snapshot.requireData.docs[index]['prayerType'];
+           return  Text('the prayer name is ${data}') ;
           },
         ) : Text('data is not avaible');
       }),
+      //['prayerType']
 
     );
   }
