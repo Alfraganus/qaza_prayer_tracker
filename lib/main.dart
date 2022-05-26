@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:qaza_prayer_tracker/firebase/firestore_service.dart';
 import 'package:qaza_prayer_tracker/provider/counter_provider.dart';
+import 'package:qaza_prayer_tracker/screens/product_list.dart';
 import 'firebase/functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -20,7 +22,7 @@ void main() async{
   );
   runApp(
     MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_) =>Counter())
+      ChangeNotifierProvider(create: (_) =>Counter()),
     ],child: MyApp(),),
   );
 }
@@ -60,7 +62,119 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
+      body:Data(),
+      /*Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 30),
+          child: Wrap(
+            spacing: 20, // to apply margin in the main axis of the wrap
+            runSpacing: 20,
+            children: <Widget>[
+              getPrayer(PrayerName: 'bondot ${context.watch<Counter>().Bondotcount}',PrayerType:'bondot' ,),
+              getPrayer(PrayerName: 'peshin ${context.watch<Counter>().peshinCount}',PrayerType:'peshin'),
+              getPrayer(PrayerName: 'asr ${context.watch<Counter>().asrCount}',PrayerType:'asr'),
+              getPrayer(PrayerName: 'shom ${context.watch<Counter>().shomCount}',PrayerType:'shom'),
+              getPrayer(PrayerName: 'xufton ${context.watch<Counter>().xuftonCount}',PrayerType:'xufton'),
+            ],
+          ),
+        ),
+      )*/
+      floatingActionButton: FloatingActionButton(
+        onPressed:() {
+          final city = <String, String>{
+            "prayerType": "Bondot",
+            "times": "1",
+            "user_id": "1",
+          };
+          db.collection("PrayerCounts").add(city).then((DocumentReference doc) =>
+              print('DocumentSnapshot added with ID: ${doc.id}'));
+        },
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+
+
+
+class getPrayer extends StatefulWidget {
+  const getPrayer({Key? key, required this.PrayerName, this.PrayerId, required this.PrayerType}) : super(key: key);
+  @override
+  final String PrayerName;
+  final String PrayerType;
+  final int? PrayerId;
+  State<getPrayer> createState() => _getPrayerState();
+}
+
+class _getPrayerState extends State<getPrayer> {
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Container(
+      child: Row(
+        children: [
+
+          RaisedButton(
+            color: Colors.red, // background
+            textColor: Colors.white, // foreground
+            onPressed: () {
+              context.read<Counter>().decrement(widget.PrayerType);
+            },
+            child: Text('-'),
+          ),
+          SizedBox(width: 20,),
+          Text(widget.PrayerName),
+          SizedBox(width: 20,),
+          RaisedButton(
+            color: Colors.red, // background
+            textColor: Colors.white, // foreground
+            onPressed: () {
+              // print(widget.PrayerType);
+              context.read<Counter>().increment(widget.PrayerType);
+            },
+            child: Text('+'),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+
+class Data extends StatelessWidget {
+   Data({Key? key}) : super(key: key);
+  final Stream<QuerySnapshot>prayers = FirebaseFirestore.instance.collection('PrayerCounts').snapshots();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: StreamBuilder<QuerySnapshot>(stream: prayers,builder:(
+          BuildContext context,
+          AsyncSnapshot<QuerySnapshot> snapshot
+          ){
+        if(snapshot.hasError) {
+          return Text('we have error');
+        }
+        if(snapshot.connectionState == ConnectionState.waiting) {
+          return Text('Loading');
+        }
+        final data = snapshot.requireData;
+        return data.docs.asMap().isNotEmpty? ListView.builder(
+          itemCount: data.size,
+          itemBuilder: (context, index) {
+           return Text('the prayer name is ${data.docs[index]['prayerType']}');
+          },
+        ) : Text('data is not avaible');
+      }),
+
+    );
+  }
+}
+
+
+/* Center(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 30),
           child: Wrap(
@@ -89,55 +203,5 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
-}
-
-
-
-
-class getPrayer extends StatefulWidget {
-  const getPrayer({Key? key, required this.PrayerName, this.PrayerId, required this.PrayerType}) : super(key: key);
-  @override
-  final String PrayerName;
-  final String PrayerType;
-  final int? PrayerId;
-  State<getPrayer> createState() => _getPrayerState();
-}
-
-class _getPrayerState extends State<getPrayer> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        children: [
-          RaisedButton(
-            color: Colors.red, // background
-            textColor: Colors.white, // foreground
-            onPressed: () {
-              context.read<Counter>().decrement(widget.PrayerType);
-            },
-            child: Text('-'),
-          ),
-          SizedBox(width: 20,),
-          Text(widget.PrayerName),
-          SizedBox(width: 20,),
-          RaisedButton(
-            color: Colors.red, // background
-            textColor: Colors.white, // foreground
-            onPressed: () {
-              // print(widget.PrayerType);
-              context.read<Counter>().increment(widget.PrayerType);
-            },
-            child: Text('+'),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-
-
+    );*/
 
