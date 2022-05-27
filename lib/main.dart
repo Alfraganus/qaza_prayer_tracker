@@ -52,8 +52,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
 
   @override
   Widget build(BuildContext context) {
@@ -63,48 +61,18 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body:Data(),
-      /*Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 30),
-          child: Wrap(
-            spacing: 20, // to apply margin in the main axis of the wrap
-            runSpacing: 20,
-            children: <Widget>[
-              getPrayer(PrayerName: 'bondot ${context.watch<Counter>().Bondotcount}',PrayerType:'bondot' ,),
-              getPrayer(PrayerName: 'peshin ${context.watch<Counter>().peshinCount}',PrayerType:'peshin'),
-              getPrayer(PrayerName: 'asr ${context.watch<Counter>().asrCount}',PrayerType:'asr'),
-              getPrayer(PrayerName: 'shom ${context.watch<Counter>().shomCount}',PrayerType:'shom'),
-              getPrayer(PrayerName: 'xufton ${context.watch<Counter>().xuftonCount}',PrayerType:'xufton'),
-            ],
-          ),
-        ),
-      )*/
-      floatingActionButton: FloatingActionButton(
-        onPressed:() {
-          final city = <String, String>{
-            "prayerType": "Bondot",
-            "times": "1",
-            "user_id": "1",
-          };
-          db.collection("PrayerCounts").add(city).then((DocumentReference doc) =>
-              print('DocumentSnapshot added with ID: ${doc.id}'));
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
 
 
 
-
 class getPrayer extends StatefulWidget {
-  const getPrayer({Key? key, required this.PrayerName, this.PrayerId, required this.PrayerType}) : super(key: key);
+  const getPrayer({Key? key, required this.PrayerName, this.Prayercount, this.PrayerOrder}) : super(key: key);
   @override
-  final String PrayerName;
-  final String PrayerType;
-  final int? PrayerId;
+  final String? PrayerName;
+  final int? Prayercount;
+  final int? PrayerOrder;
   State<getPrayer> createState() => _getPrayerState();
 }
 
@@ -112,28 +80,39 @@ class _getPrayerState extends State<getPrayer> {
 
   @override
   Widget build(BuildContext context) {
-
+  CollectionReference prayer = FirebaseFirestore.instance.collection('PrayerCounts');
+  var numberofTimes = widget.Prayercount;
     return Container(
       child: Row(
         children: [
-
           RaisedButton(
             color: Colors.red, // background
             textColor: Colors.white, // foreground
             onPressed: () {
-              context.read<Counter>().decrement(widget.PrayerType);
+              prayer.doc(findDocument(widget.PrayerOrder)).update( <String, dynamic>{
+                "prayerType": widget.PrayerName,
+                "order": widget.PrayerOrder,
+                "times": numberofTimes! - 1,
+                "user_id": 1,
+              });
+
+              // context.read<Counter>().decrement(widget.PrayerType);
             },
             child: Text('-'),
           ),
           SizedBox(width: 20,),
-          Text(widget.PrayerName),
+          Text(widget.PrayerName!+' '+widget.Prayercount.toString()),
           SizedBox(width: 20,),
           RaisedButton(
             color: Colors.red, // background
             textColor: Colors.white, // foreground
             onPressed: () {
-              // print(widget.PrayerType);
-              context.read<Counter>().increment(widget.PrayerType);
+              prayer.doc(findDocument(widget.PrayerOrder)).update( <String, dynamic>{
+                "prayerType": widget.PrayerName,
+                "order": widget.PrayerOrder,
+                "times": numberofTimes! + 1,
+                "user_id": 1,
+              });
             },
             child: Text('+'),
           )
@@ -143,13 +122,22 @@ class _getPrayerState extends State<getPrayer> {
   }
 }
 
-
 class Data extends StatelessWidget {
    Data({Key? key}) : super(key: key);
-  final Stream<QuerySnapshot>prayers = FirebaseFirestore.instance.collection('PrayerCounts').where('prayerType',isEqualTo: 'Bondot').snapshots();
+  final Stream<QuerySnapshot>prayers = FirebaseFirestore.instance.collection('PrayerCounts').orderBy('order').snapshots();
+
+   static getPrayerData(prayerName,times,order) {
+     <String, dynamic>{
+       "prayerType": prayerName,
+       "order": order,
+       "times": times! + 1,
+       "user_id": 1,
+     };
+   }
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.symmetric(vertical: 50,horizontal: 50),
       child: StreamBuilder<QuerySnapshot>(stream: prayers,builder:(
           BuildContext context,
           AsyncSnapshot<QuerySnapshot> snapshot
@@ -161,11 +149,19 @@ class Data extends StatelessWidget {
           return Text('Loading');
         }
         return snapshot.hasData  ? ListView.builder(
-
           itemCount: snapshot.requireData.size,
           itemBuilder: (context, index) {
-            var data = snapshot.requireData.docs[index]['prayerType'];
-           return  Text('the prayer name is ${data}') ;
+            var name = snapshot.requireData.docs[index]['prayerType'];
+            var count = snapshot.requireData.docs[index]['times'];
+            var order = snapshot.requireData.docs[index]['order'];
+           return   Padding(
+             padding: EdgeInsets.only(top: 25),
+             child: getPrayer(
+                 PrayerName: name,
+                 Prayercount: count,
+                PrayerOrder: order,
+             ),
+           );
           },
         ) : Text('data is not avaible');
       }),
@@ -175,35 +171,21 @@ class Data extends StatelessWidget {
   }
 }
 
+ findDocument(order) {
+   switch (order) {
+     case 1 :
+       return '0HdCx4MM4A0ymx6uzgg0';
+     case 2 :
+       return 'sxIXDxmGFYETY44kQwOd';
+     case 3 :
+       return '6OphRv3xxYjHAC8sEbOg';
+     case 4 :
+       return 'jelTOPDxyjfcYkh8jNcA';
+     case 5 :
+       return 'tih5MXDsaNAGXw6K0oYp';
+   }
+ }
 
-/* Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 30),
-          child: Wrap(
-            spacing: 20, // to apply margin in the main axis of the wrap
-            runSpacing: 20,
-            children: <Widget>[
-              getPrayer(PrayerName: 'bondot ${context.watch<Counter>().Bondotcount}',PrayerType:'bondot' ,),
-              getPrayer(PrayerName: 'peshin ${context.watch<Counter>().peshinCount}',PrayerType:'peshin'),
-              getPrayer(PrayerName: 'asr ${context.watch<Counter>().asrCount}',PrayerType:'asr'),
-              getPrayer(PrayerName: 'shom ${context.watch<Counter>().shomCount}',PrayerType:'shom'),
-              getPrayer(PrayerName: 'xufton ${context.watch<Counter>().xuftonCount}',PrayerType:'xufton'),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed:() {
-          final city = <String, String>{
-            "prayerType": "Bondot",
-            "times": "1",
-            "user_id": "1",
-          };
-        db.collection("PrayerCounts").add(city).then((DocumentReference doc) =>
-            print('DocumentSnapshot added with ID: ${doc.id}'));
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );*/
+
+
 
